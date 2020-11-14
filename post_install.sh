@@ -1,5 +1,15 @@
 #!/bin/sh
 
+my-domain() {
+  cat /var/db/dhclient.leases.epair0b \
+   | grep domain-name \
+   | grep -v server \
+   | tail -n 1 \
+   | awk -F\" '{ print $2 }'
+}
+
+MY_FQDN="`hostname`.`my-domain`"
+
 # Enable the service
 sysrc -f /etc/rc.conf nginx_enable="YES"
 sysrc -f /etc/rc.conf mysql_enable="YES"
@@ -104,6 +114,9 @@ fi
 su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install --database=\"sqlite\" --database-name=\"owncloud\" --database-user=\"$USER\" --database-pass=\"$PASS\" --database-host=\"localhost\" --admin-user=\"$NCUSER\" --admin-pass=\"$NCPASS\" --data-dir=\"/usr/local/www/nextcloud/data\"" 
 su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value=\"${IOCAGE_PLUGIN_IP}\""
 
+# enable FQDN access
+su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 2 --value=\"${MY_FQDN}\""
+
 #workaround for occ (in shell just use occ instead of su -m www -c "....")
 echo >> .cshrc
 echo alias occ ./occ.sh >> .cshrc
@@ -117,7 +130,10 @@ sed -i '' "s|false|true|g" /usr/local/www/nextcloud/config/config.php
 mkdir -p /usr/local/www/nextcloud-sessions-tmp >/dev/null 2>/dev/null
 chmod o-rwx /usr/local/www/nextcloud-sessions-tmp
 chown -R www:www /usr/local/www/nextcloud-sessions-tmp
-chown -R www:www /usr/local/www/nextcloud/app-pkgs
+
+if [ -d /usr/local/www/nextcloud/app-pkgs ]; then
+   chown -R www:www /usr/local/www/nextcloud/app-pkgs
+fi
 
 chmod -R o-rwx /usr/local/www/nextcloud
 
