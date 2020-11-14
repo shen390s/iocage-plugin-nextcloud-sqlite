@@ -101,7 +101,7 @@ if [ -e "/etc/iocage-env" ] ; then
 fi
 
 #Use occ to complete Nextcloud installation
-su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install --database=\"sqlite3\" --database-name=\"nextcloud\" --database-user=\"$USER\" --database-pass=\"$PASS\" --database-host=\"localhost\" --admin-user=\"$NCUSER\" --admin-pass=\"$NCPASS\" --data-dir=\"/usr/local/www/nextcloud/data\"" 
+su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install --database=\"sqlite\" --database-name=\"owncloud\" --database-user=\"$USER\" --database-pass=\"$PASS\" --database-host=\"localhost\" --admin-user=\"$NCUSER\" --admin-pass=\"$NCPASS\" --data-dir=\"/usr/local/www/nextcloud/data\"" 
 su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value=\"${IOCAGE_PLUGIN_IP}\""
 
 #workaround for occ (in shell just use occ instead of su -m www -c "....")
