@@ -117,6 +117,8 @@ su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains
 # enable FQDN access
 su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 2 --value=\"${MY_FQDN}\""
 
+# enable nextcloud hostname
+su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 3 --value=\"nextcloud.`my-domain`\""
 #workaround for occ (in shell just use occ instead of su -m www -c "....")
 echo >> .cshrc
 echo alias occ ./occ.sh >> .cshrc
@@ -139,6 +141,11 @@ chmod -R o-rwx /usr/local/www/nextcloud
 
 #updater needs this
 chown -R www:www /usr/local/www/nextcloud
+
+# restore 
+if [ -x /root/nextcloud.restore ]; then
+   /root/nextcloud.restore
+fi
 
 #restart the services to make sure we have pick up the new permission
 service php-fpm restart 2>/dev/null
